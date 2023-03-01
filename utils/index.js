@@ -1,6 +1,11 @@
-const { JWT_SECRET } = process.env;
-const jwt = require("jsonwebtoken");
+const {
+  JWT_SECRET_ACCESS_TOKEN,
+  JWT_SECRET_REFRESH_TOKEN,
+  JWT_SECRET_ACCESS_TOKEN_TIME,
+  JWT_SECRET_REFRESH_TOKEN_TIME,
+} = process.env;
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 
 /**
@@ -12,8 +17,9 @@ const validationResponse = (body) => {
 };
 
 /**
- ** Generates a new password.
+ ** Generates a new hash.
  * @param  {string} password
+ * @return {string} hash
  */
 const generatePassword = async (password) => {
   try {
@@ -26,7 +32,47 @@ const generatePassword = async (password) => {
   }
 };
 
+/**
+ ** Trims and Converts the Input String to Lowercase.
+ * @param  {string} str
+ * @returns {string} str
+ */
+const trimLowerCaseString = (str) => str.toLowerCase().replace(/\s+/g, "");
+
+/**
+ * checks password
+ * @param {string} password
+ * @param {string} hash
+ */
+
+const checkPassword = async (password, hash) =>
+  await bcrypt.compare(password, hash);
+
+/**
+ * generates access-token and refresh-token
+ * @param {object} userInfo
+ * @return {string} access-token and refresh-token
+ */
+
+const generateTokenSet = (userInfo) => {
+  const accessToken = jwt.sign(userInfo, JWT_SECRET_ACCESS_TOKEN, {
+    expiresIn: JWT_SECRET_ACCESS_TOKEN_TIME,
+  });
+
+  const refreshToken = jwt.sign(userInfo, JWT_SECRET_REFRESH_TOKEN, {
+    expiresIn: JWT_SECRET_REFRESH_TOKEN_TIME,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
+
 module.exports = {
   generatePassword,
   validationResponse,
+  trimLowerCaseString,
+  checkPassword,
+  generateTokenSet,
 };

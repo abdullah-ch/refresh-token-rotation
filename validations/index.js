@@ -12,6 +12,18 @@ const userSignUpRules = () => {
   ];
 };
 
+const userLogInRules = () => {
+  return [
+    body("email").isEmail().withMessage("Invalid Email Format"),
+    body("password")
+      .not()
+      .isEmpty()
+      .bail()
+      .isLength({ min: 6 })
+      .withMessage("password must be at least 6 chars long"),
+  ];
+};
+
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
@@ -27,5 +39,6 @@ const validate = (req, res, next) => {
 
 module.exports = {
   userSignUpRules,
+  userLogInRules,
   validate,
 };

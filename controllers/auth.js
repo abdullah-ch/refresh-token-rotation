@@ -1,11 +1,13 @@
-const { validationResult } = require("express-validator");
 const { getUserByEmail, saveUser } = require("../services/user");
-const { generatePassword, validationResponse } = require("../utils");
+const {
+  generatePassword,
+  trimLowerCaseString,
+  checkPassword,
+  generateTokenSet,
+} = require("../utils");
 
 const signupUser = async (req, res, next) => {
-  //   cDonsole.log("SIGN UP ==========>");
   try {
-    // console.log("req.body ===> ", req.body);
     const { email, password, name } = req.body;
     const isUser = await getUserByEmail(email);
     if (isUser) {
@@ -37,6 +39,50 @@ const signupUser = async (req, res, next) => {
   }
 };
 
+const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const trimmedEmail = trimLowerCaseString(email);
+    const user = await getUserByEmail(trimmedEmail);
+
+    if (!user)
+      return res.status(400).send({
+        error: "User does not exist",
+      });
+
+    if (!(await checkPassword(password, user.password))) {
+      return res.status(400).send({
+        error: "Email or Password is not correct",
+      });
+    }
+
+    // creates JWT TOKEN SET
+    const { accessToken, refreshToken } = generateTokenSet({
+      name: user.name,
+      id: user._id,
+      email: user.email,
+    });
+
+    console.log(
+      "ACCESS TOKEN ===> ",
+      accessToken,
+      " REFRESH TOKEN =====> ",
+      refreshToken
+    );
+
+    // Save Refresh Token To DATABASE and send Refresh Token as a cookie
+
+    return res.status(200).send({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      error: error,
+    });
+  }
+};
 module.exports = {
   signupUser,
+  loginUser,
 };
