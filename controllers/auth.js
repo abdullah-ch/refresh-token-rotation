@@ -3,18 +3,17 @@ const { getUserByEmail, saveUser } = require("../services/user");
 const { generatePassword, validationResponse } = require("../utils");
 
 const signupUser = async (req, res, next) => {
-  //   console.log("SIGN UP ==========>");
+  //   cDonsole.log("SIGN UP ==========>");
   try {
-    await validationResponse(req);
+    // console.log("req.body ===> ", req.body);
     const { email, password, name } = req.body;
-    const isUser = getUserByEmail(email);
-
+    const isUser = await getUserByEmail(email);
     if (isUser) {
       return res.status(400).send({ message: "Email is already taken !" });
     }
 
     // create password hash
-    const hashedPassword = generatePassword(password);
+    const hashedPassword = await generatePassword(password);
     const user = {
       name,
       email,
