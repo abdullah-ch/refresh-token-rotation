@@ -88,7 +88,22 @@ const loginUser = async (req, res, next) => {
     });
   }
 };
+
+const refreshTokenSets = async (req, res, next) => {
+  try {
+    /**
+     * check cookie
+     * verify refreshToken
+     */
+  } catch (error) {
+    console.log("ERRROR ===> error ", error);
+    return res.status(500).send({
+      error: error,
+    });
+  }
+};
 module.exports = {
   signupUser,
   loginUser,
+  refreshTokenSets,
 };

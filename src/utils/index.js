@@ -43,6 +43,7 @@ const trimLowerCaseString = (str) => str.toLowerCase().replace(/\s+/g, "");
  * checks password
  * @param {string} password
  * @param {string} hash
+ * @returns A promise to be either resolved with the comparison result salt or rejected with an Error
  */
 
 const checkPassword = async (password, hash) =>
@@ -68,7 +69,11 @@ const generateTokenSet = (userInfo) => {
     refreshToken,
   };
 };
-
+/**
+ * decodes JWT Token
+ * @param {string} token
+ * @returns {object} decodedUserInformation
+ */
 const extractUser = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET_ACCESS_TOKEN);
