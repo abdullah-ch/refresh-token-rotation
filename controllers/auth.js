@@ -1,4 +1,9 @@
-const { getUserByEmail, saveUser } = require("../services/user");
+const {
+  getUserByEmail,
+  saveUser,
+  updateUserById,
+  assignRefreshTokenToUser,
+} = require("../services/user");
 const {
   generatePassword,
   trimLowerCaseString,
@@ -63,20 +68,21 @@ const loginUser = async (req, res, next) => {
       email: user.email,
     });
 
-    console.log(
-      "ACCESS TOKEN ===> ",
-      accessToken,
-      " REFRESH TOKEN =====> ",
-      refreshToken
-    );
-
     // Save Refresh Token To DATABASE and send Refresh Token as a cookie
+
+    await assignRefreshTokenToUser(user._id, refreshToken);
+
+    res.cookie("refreshToken", refreshToken, {
+      maxAge: process.env.JWT_SECRET_REFRESH_TOKEN_TIME,
+      httpOnly: true, // The cookie only accessible by the web server
+    });
 
     return res.status(200).send({
       accessToken: accessToken,
-      refreshToken: refreshToken,
+      message: "Logged In Successfully !",
     });
   } catch (error) {
+    console.log("ERRROR ===> error");
     return res.status(500).send({
       error: error,
     });

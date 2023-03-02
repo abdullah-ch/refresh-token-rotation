@@ -19,6 +19,7 @@ let user = new Schema(
       type: String,
       required: [true, "Please provide password of a user"],
     },
+    refreshToken: [],
   },
   {
     timestamps: true,

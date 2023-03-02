@@ -25,7 +25,34 @@ const saveUser = async (userPayload) => {
     });
 };
 
+const updateUserById = async (id, userPayload) => {
+  const updatedUser = await userModel.updateOne(
+    {
+      _id: id,
+    },
+    userPayload
+  );
+
+  return updatedUser;
+};
+
+const assignRefreshTokenToUser = async (id, refreshToken) => {
+  const updatedUser = await userModel.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $push: {
+        refreshToken,
+      },
+    }
+  );
+
+  return updatedUser;
+};
 module.exports = {
   getUserByEmail,
   saveUser,
+  updateUserById,
+  assignRefreshTokenToUser,
 };
