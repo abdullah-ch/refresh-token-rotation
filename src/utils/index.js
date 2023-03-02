@@ -69,10 +69,19 @@ const generateTokenSet = (userInfo) => {
   };
 };
 
+const extractUser = (token) => {
+  try {
+    return jwt.verify(token, JWT_SECRET_ACCESS_TOKEN);
+  } catch (error) {
+    console.log("error ===> ", error);
+    throw error;
+  }
+};
 module.exports = {
   generatePassword,
   validationResponse,
   trimLowerCaseString,
   checkPassword,
   generateTokenSet,
+  extractUser,
 };

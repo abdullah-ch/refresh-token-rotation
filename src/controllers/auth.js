@@ -73,7 +73,7 @@ const loginUser = async (req, res, next) => {
     await assignRefreshTokenToUser(user._id, refreshToken);
 
     res.cookie("refreshToken", refreshToken, {
-      maxAge: process.env.JWT_SECRET_REFRESH_TOKEN_TIME,
+      maxAge: 60 * 60,
       httpOnly: true, // The cookie only accessible by the web server
     });
 
@@ -82,7 +82,7 @@ const loginUser = async (req, res, next) => {
       message: "Logged In Successfully !",
     });
   } catch (error) {
-    console.log("ERRROR ===> error");
+    console.log("ERRROR ===> error ", error);
     return res.status(500).send({
       error: error,
     });

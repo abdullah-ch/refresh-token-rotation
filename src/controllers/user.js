@@ -1,8 +1,14 @@
+const { getSpecificDetailsUser } = require("../services/user");
+
 const getUserInformation = async (req, res, next) => {
   try {
-    console.log("CURRENT USER INFORMATION =====> ");
+    const userDetails = await getSpecificDetailsUser(req.user.id, {
+      name: 1,
+      email: 1,
+      _id: 0,
+    });
     return res.status(200).send({
-      user: "User Details =======>",
+      data: userDetails,
     });
   } catch (error) {
     return res.status(500).send({
