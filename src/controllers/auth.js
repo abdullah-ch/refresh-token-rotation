@@ -95,6 +95,8 @@ const refreshTokenSets = async (req, res, next) => {
      * check cookie
      * verify refreshToken
      */
+
+    console.log("Cookies ====> ", req.cookie);
   } catch (error) {
     console.log("ERRROR ===> error ", error);
     return res.status(500).send({

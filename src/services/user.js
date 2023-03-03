@@ -82,10 +82,23 @@ const getSpecificDetailsUser = async (id, details) => {
   return userDetails;
 };
 
+const findUserRefreshToken = async (id, refreshToken) => {
+  const userRefreshToken = await userModel.find({
+    _id: id,
+    refreshToken: {
+      $in: refreshToken,
+    },
+  });
+
+  console.log("");
+  return userRefreshToken;
+};
+
 module.exports = {
   getUserByEmail,
   saveUser,
   updateUserById,
   assignRefreshTokenToUser,
   getSpecificDetailsUser,
+  findUserRefreshToken,
 };
