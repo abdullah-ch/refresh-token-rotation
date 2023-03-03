@@ -1,12 +1,12 @@
 import "./App.css";
+import { BrowserRouter } from "react-router-dom";
+import Router from "./Routes";
 
 function App() {
   return (
-    <>
-      <header className="bg-black">
-        <h1>REFRESG TOKEN</h1>
-      </header>
-    </>
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
   );
 }
 
