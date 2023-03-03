@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 // import { removeCookies } from "../../utils";
 import { PURGE } from "redux-persist";
+import { logInUser } from "../../Services/auth";
 import { getUser } from "../../Services/user";
 
 export const userSlice = createSlice({
@@ -26,8 +27,22 @@ export const userSlice = createSlice({
 
 export const { setUser, setLogIn } = userSlice.actions;
 
-// The function below is called a thunk and allows us to perform async logic. It
-// can be dispatched like a regular action: `dispatch
+export const logIn = (userInfo) => {
+  return async (dispatch) => {
+    try {
+      console.log("SENDING CREDENTIALS ===> ", userInfo);
+      const response = await logInUser(userInfo);
+      console.log("RESPONSE ===> ", response.data);
+      dispatch(setLogIn(true));
+    } catch (error) {
+      console.log(
+        "error ==> getCurrentUser ==>",
+        error?.response?.data?.errors[0]
+      );
+      alert(error?.response?.data?.errors[0]);
+    }
+  };
+};
 
 export const getCurrentUser = () => {
   return async (dispatch) => {
@@ -44,14 +59,6 @@ export const getCurrentUser = () => {
 export const logOutUser = () => {
   return async (dispatch) => {
     try {
-      //   const response = await signOutUser();
-      //   console.log("Response ===> logOutUser", response.data);
-      //   // purge any persisted State
-      //   //   purgePersistance();
-      //   //   console.log("purge ===> ", persistor);
-      //   // remove all cookies
-      //   removeCookies();
-      //   window.location.href = "/signin";
     } catch (error) {
       console.log("error ==> getCurrentUser ==>", error);
       alert(error?.response?.data?.errors[0]);
