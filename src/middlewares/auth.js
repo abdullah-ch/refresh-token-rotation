@@ -6,10 +6,11 @@ const { extractUser } = require("../utils");
 const verifyToken = (req, res, next) => {
   const token = req.headers["authorization"];
 
+  console.log("TOKEN ====> ", token);
   if (!token)
     return res.status(403).send({ data: "No authorization token found" });
   try {
-    const decodedUser = extractUser(token.split(" ")[1]);
+    const decodedUser = extractUser(token, process.env.JWT_SECRET_ACCESS_TOKEN);
     req.user = decodedUser;
     return next();
   } catch (err) {

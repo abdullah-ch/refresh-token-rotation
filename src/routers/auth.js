@@ -9,6 +9,6 @@ const { userSignUpRules, validate, userLogInRules } = require("../validations");
 
 authRouter.post("/sign-up", userSignUpRules(), validate, signupUser);
 authRouter.post("/login", userLogInRules(), validate, loginUser);
-authRouter.get("/refresh-token", refreshTokenSets);
+authRouter.get("/refresh", refreshTokenSets);
 
 module.exports = authRouter;

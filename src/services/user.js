@@ -83,17 +83,62 @@ const getSpecificDetailsUser = async (id, details) => {
 };
 
 const findUserRefreshToken = async (id, refreshToken) => {
-  const userRefreshToken = await userModel.find({
+  const userRefreshToken = await userModel.findOne({
     _id: id,
     refreshToken: {
-      $in: refreshToken,
+      $in: [refreshToken],
     },
   });
 
-  console.log("");
   return userRefreshToken;
 };
 
+const removeRefreshTokensUser = async (id) => {
+  const user = await userModel.updateOne(
+    {
+      _id: id,
+    },
+    {
+      refreshToken: [],
+    }
+  );
+  return user;
+};
+
+const replaceRefreshTokenUser = async (
+  id,
+  oldRefreshToken,
+  newRefreshToken
+) => {
+  const updatedUser = await userModel.updateOne(
+    {
+      _id: id,
+      refreshToken: oldRefreshToken,
+    },
+    {
+      $set: {
+        "refreshToken.$": newRefreshToken,
+      },
+    }
+  );
+
+  return updatedUser;
+};
+
+const removeRefreshTokenUser = async (id, refreshToken) => {
+  const updatedUser = await userModel.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $pull: {
+        refreshToken: refreshToken,
+      },
+    }
+  );
+
+  return updatedUser;
+};
 module.exports = {
   getUserByEmail,
   saveUser,
@@ -101,4 +146,7 @@ module.exports = {
   assignRefreshTokenToUser,
   getSpecificDetailsUser,
   findUserRefreshToken,
+  removeRefreshTokensUser,
+  replaceRefreshTokenUser,
+  removeRefreshTokenUser,
 };

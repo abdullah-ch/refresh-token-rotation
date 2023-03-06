@@ -3,12 +3,18 @@ const {
   saveUser,
   updateUserById,
   assignRefreshTokenToUser,
+  findUserRefreshToken,
+  removeRefreshTokensUser,
+  replaceRefreshTokenUser,
+  removeRefreshTokenUser,
 } = require("../services/user");
 const {
   generatePassword,
   trimLowerCaseString,
   checkPassword,
   generateTokenSet,
+  extractUser,
+  decodeUser,
 } = require("../utils");
 
 const signupUser = async (req, res, next) => {
@@ -73,7 +79,8 @@ const loginUser = async (req, res, next) => {
     await assignRefreshTokenToUser(user._id, refreshToken);
 
     res.cookie("refreshToken", refreshToken, {
-      maxAge: 60 * 60,
+      maxAge: 60 * 60 * 1000,
+      secure: true,
       httpOnly: true, // The cookie only accessible by the web server
     });
 
@@ -91,14 +98,104 @@ const loginUser = async (req, res, next) => {
 
 const refreshTokenSets = async (req, res, next) => {
   try {
-    /**
-     * check cookie
-     * verify refreshToken
-     */
+    const { refreshToken } = req.cookies;
 
-    console.log("Cookies ====> ", req.cookie);
+    if (!refreshToken) {
+      res.clearCookie("refreshToken");
+      return res.status(403).send({
+        message: "No Refresh Token Found !",
+      });
+    }
+
+    const decodedUser = extractUser(
+      refreshToken,
+      process.env.JWT_SECRET_REFRESH_TOKEN
+    );
+
+    req.user = decodedUser;
+    console.log("DECODED USER ====> refreshTokenSets ", req.user);
+
+    const refreshTokenFound = await findUserRefreshToken(
+      decodedUser.id,
+      refreshToken
+    );
+    // RT is verified but is not present in the Database
+    // it's a hacker
+
+    if (!refreshTokenFound) {
+      console.log(
+        "RT is verified but is not present in the database ===> A Hacker is sending this token !!!"
+      );
+      await removeRefreshTokensUser(decodedUser.id);
+      res.clearCookie("refreshToken");
+      return res.status(403).send({
+        message: "Refresh Token is invalid !",
+      });
+    }
+
+    // generate new Tokens (access Token and refresh Token) and
+    // update the RT with this request with newly created RT from the token set
+    // created
+
+    const tokenSet = generateTokenSet({
+      name: decodedUser.name,
+      id: decodedUser.id,
+      email: decodedUser.email,
+    });
+
+    const updatedRefreshToken = await replaceRefreshTokenUser(
+      decodedUser.id,
+      refreshToken,
+      tokenSet.refreshToken
+    );
+
+    if (updatedRefreshToken) {
+      console.log(
+        "updatedRefreshToken ====> replaceRefreshTokenUser ===>  ",
+        updatedRefreshToken
+      );
+
+      res.cookie("refreshToken", tokenSet.refreshToken, {
+        maxAge: 60 * 60 * 1000,
+        secure: true,
+        httpOnly: true, // The cookie only accessible by the web server
+      });
+
+      return res.status(200).send({
+        accessToken: tokenSet.accessToken,
+      });
+    }
   } catch (error) {
-    console.log("ERRROR ===> error ", error);
+    const { refreshToken } = req.cookies;
+    let updatedUser = null;
+    res.clearCookie("refreshToken");
+
+    const decodedUser = decodeUser(
+      refreshToken,
+      process.env.JWT_SECRET_REFRESH_TOKEN
+    );
+
+    console.log("decodedUser ===> without verifying ===> ", decodedUser);
+
+    // remove expired refreshToken From Users RT List
+    if (decodedUser) {
+      updatedUser = await removeRefreshTokenUser(decodedUser.id, refreshToken);
+    }
+
+    console.log("ERRROR ===> error ===> refreshTokenSets ", error.message);
+    if (error?.message === "jwt expired") {
+      if (updatedUser) {
+        console.log("updatedUser ===> ", updatedUser);
+        return res.status(403).send({
+          message: "Refresh Token has expired !",
+        });
+      }
+    } else if (error?.message === "jwt malformed") {
+      return res.status(403).send({
+        message: "Refresh Token is malformed !",
+      });
+    }
+
     return res.status(500).send({
       error: error,
     });

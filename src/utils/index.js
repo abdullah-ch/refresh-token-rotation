@@ -74,13 +74,17 @@ const generateTokenSet = (userInfo) => {
  * @param {string} token
  * @returns {object} decodedUserInformation
  */
-const extractUser = (token) => {
+const extractUser = (token, secret) => {
   try {
-    return jwt.verify(token, JWT_SECRET_ACCESS_TOKEN);
+    return jwt.verify(token, secret);
   } catch (error) {
-    console.log("error ===> ", error);
+    console.log("error ===> extractUser ", error);
     throw error;
   }
+};
+
+const decodeUser = (token, secret) => {
+  return jwt.decode(token, secret);
 };
 module.exports = {
   generatePassword,
@@ -89,4 +93,5 @@ module.exports = {
   checkPassword,
   generateTokenSet,
   extractUser,
+  decodeUser,
 };
