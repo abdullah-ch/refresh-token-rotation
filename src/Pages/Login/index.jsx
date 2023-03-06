@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logIn } from "../../Store/Slices/userSlice";
 
@@ -10,7 +9,6 @@ const Login = () => {
     email: null,
     password: null,
   });
-  const navigate = useNavigate();
 
   const handleCredentials = (e) => {
     const { value, name } = e.target;
@@ -30,7 +28,6 @@ const Login = () => {
     try {
       // redirect to home
       dispatch(logIn(credentials));
-      navigate("/");
     } catch (error) {
       console.log("error ==> ", error);
       alert(error?.response?.data?.errors[0]);

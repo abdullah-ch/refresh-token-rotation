@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import { removeCookies } from "../../utils";
-import { PURGE } from "redux-persist";
 import { logInUser } from "../../Services/auth";
 import { getUser } from "../../Services/user";
 
@@ -18,11 +16,11 @@ export const userSlice = createSlice({
       state.isLoggedIn = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(PURGE, (state) => {
-      state = null;
-    });
-  },
+  // extraReducers: (builder) => {
+  //   builder.addCase(PURGE, (state) => {
+  //     state = null;
+  //   });
+  // },
 });
 
 export const { setUser, setLogIn } = userSlice.actions;
@@ -32,8 +30,11 @@ export const logIn = (userInfo) => {
     try {
       console.log("SENDING CREDENTIALS ===> ", userInfo);
       const response = await logInUser(userInfo);
-      console.log("RESPONSE ===> ", response.data);
+      console.log("RESPONSE ===> ", response.data.accessToken);
+      // set the access token in localStorage
+      localStorage.setItem("accessToken", response.data.accessToken);
       dispatch(setLogIn(true));
+      window.location.href = "/";
     } catch (error) {
       console.log(
         "error ==> getCurrentUser ==>",

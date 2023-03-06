@@ -1,5 +1,6 @@
 import axios from "axios";
-// import { persistor } from "../App/store";
+import { refreshTokens } from "./auth";
+
 // import { removeCookies } from "../utils";
 
 const instance = axios.create({
@@ -12,9 +13,7 @@ instance.interceptors.request.use((config) => {
   //   if (config.url === "auth/sign_in") {
   //     return config;
   //   }
-  //   config.headers["uid"] = cookies.get("uid");
-  //   config.headers["access-token"] = cookies.get("access-token");
-  //   config.headers["client"] = cookies.get("client");
+  config.headers["authorization"] = localStorage.getItem("accessToken");
 
   return config;
 });
@@ -25,19 +24,24 @@ instance.interceptors.response.use(
     // Do something with response data
     return response;
   },
-  function (error) {
+  async function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    console.log("error code ========> ", error.response.status);
     if (error.response.status === 401) {
+      try {
+        const { data } = await refreshTokens();
+        console.log("RESPONSE ===> refreshTokens ===> ", data);
+        localStorage.setItem("accessToken", data.accessToken);
+      } catch (error) {
+        console.log("ERROR =====> REFRESH ", error);
+      }
+    } else if (error.response.status === 403) {
       //   purge any persisted state
-      //   persistor.purge().then(() => {
-      //     removeCookies();
-      //     window.location.href = "/signin";
-      //   });
+      // console.log("PURGE ====> ", persistor);
+      // persistor.purge().then(() => {
+      //   console.log("PURGING !!!!");
+      // });
     }
     return Promise.reject(error);
   }
 );
-// logout on 401
 export default instance;
