@@ -22,7 +22,7 @@ const signupUser = async (req, res, next) => {
     const { email, password, name } = req.body;
     const isUser = await getUserByEmail(email);
     if (isUser) {
-      return res.status(400).send({ message: "Email is already taken !" });
+      return res.status(400).send({ errors: ["Email is already taken !"] });
     }
 
     // create password hash
@@ -45,7 +45,7 @@ const signupUser = async (req, res, next) => {
       });
   } catch (error) {
     return res.status(500).send({
-      error: error,
+      errors: [error],
     });
   }
 };
