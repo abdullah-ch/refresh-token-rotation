@@ -79,7 +79,7 @@ const loginUser = async (req, res, next) => {
     await assignRefreshTokenToUser(user._id, refreshToken);
 
     res.cookie("refreshToken", refreshToken, {
-      maxAge: 60 * 60 * 1000,
+      maxAge: process.env.JWT_COOKIE_EXPIRY_TIME * 1000,
       secure: true,
       httpOnly: true, // The cookie only accessible by the web server
     });
@@ -156,7 +156,7 @@ const refreshTokenSets = async (req, res, next) => {
       );
 
       res.cookie("refreshToken", tokenSet.refreshToken, {
-        maxAge: 60 * 60 * 1000,
+        maxAge: process.env.JWT_COOKIE_EXPIRY_TIME * 1000,
         secure: true,
         httpOnly: true, // The cookie only accessible by the web server
       });
