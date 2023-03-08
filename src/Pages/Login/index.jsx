@@ -74,7 +74,13 @@ const Login = () => {
       >
         Submit
       </button>
-      <input />
+      <div>
+        Don't have an account ?{" "}
+        <a href="signup" className="text-blue-600">
+          {" "}
+          Sign Up Here !
+        </a>
+      </div>
     </div>
   );
 };
