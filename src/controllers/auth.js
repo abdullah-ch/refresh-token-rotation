@@ -201,8 +201,87 @@ const refreshTokenSets = async (req, res, next) => {
     });
   }
 };
+
+const logOut = async (req, res, next) => {
+  try {
+    res.clearCookie("refreshToken");
+
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+      return res.status(403).send({
+        message: "No Refresh Token Found !",
+      });
+    }
+
+    const decodedUser = extractUser(
+      refreshToken,
+      process.env.JWT_SECRET_REFRESH_TOKEN
+    );
+
+    console.log("DECODED USER ====> logOut ", decodedUser);
+
+    const refreshTokenFound = await findUserRefreshToken(
+      decodedUser.id,
+      refreshToken
+    );
+
+    // RT is verified but is not present in the Database
+    // it's a hacker
+
+    if (!refreshTokenFound) {
+      console.log(
+        "RT is verified but is not present in the database ===> A Hacker is sending this token !!!"
+      );
+      await removeRefreshTokensUser(decodedUser.id);
+      return res.status(403).send({
+        message: "Refresh Token is invalid !",
+      });
+    }
+
+    // remove verified refreshToken From Users RT List
+    await removeRefreshTokenUser(decodedUser.id, refreshToken);
+    return res.sendStatus(204);
+  } catch (error) {
+    res.clearCookie("refreshToken");
+
+    const { refreshToken } = req.cookies;
+    let updatedUser = null;
+
+    const decodedUser = decodeUser(
+      refreshToken,
+      process.env.JWT_SECRET_REFRESH_TOKEN
+    );
+    console.log("decodedUser ===> without verifying ===> ", decodedUser);
+
+    // remove expired refreshToken From Users RT List
+    if (decodedUser) {
+      updatedUser = await removeRefreshTokenUser(decodedUser.id, refreshToken);
+    }
+
+    console.log("ERRROR ===> error ===> logOut ", error.message);
+
+    if (error?.message === "jwt expired") {
+      if (updatedUser) {
+        console.log("updatedUser ===> ", updatedUser);
+        return res.status(403).send({
+          message: "Refresh Token has expired !",
+        });
+      }
+    } else if (error?.message === "jwt malformed") {
+      return res.status(403).send({
+        message: "Refresh Token is malformed !",
+      });
+    }
+
+    return res.status(403).send({
+      error: error,
+    });
+  }
+};
 module.exports = {
   signupUser,
   loginUser,
   refreshTokenSets,
+  logOut,
 };
