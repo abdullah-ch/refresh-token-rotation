@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { PURGE } from "redux-persist";
 import { logInUser } from "../../Services/auth";
 import { getUser } from "../../Services/user";
 
@@ -15,15 +16,18 @@ export const userSlice = createSlice({
     setLogIn: (state, action) => {
       state.isLoggedIn = action.payload;
     },
+    resetState: (state, action) => {
+      state = null;
+    },
   },
-  // extraReducers: (builder) => {
-  //   builder.addCase(PURGE, (state) => {
-  //     state = null;
-  //   });
-  // },
+  extraReducers: (builder) => {
+    builder.addCase(PURGE, (state) => {
+      state = null;
+    });
+  },
 });
 
-export const { setUser, setLogIn } = userSlice.actions;
+export const { setUser, setLogIn, resetState } = userSlice.actions;
 
 export const logIn = (userInfo) => {
   return async (dispatch) => {
@@ -57,15 +61,15 @@ export const getCurrentUser = () => {
     }
   };
 };
-export const logOutUser = () => {
-  return async (dispatch) => {
-    try {
-    } catch (error) {
-      console.log("error ==> getCurrentUser ==>", error);
-      alert(error?.response?.data?.errors[0]);
-    }
-  };
-};
+// export const logOutUser = () => {
+//   return async (dispatch) => {
+//     try {
+//     } catch (error) {
+//       console.log("error ==> getCurrentUser ==>", error);
+//       alert(error?.response?.data?.errors[0]);
+//     }
+//   };
+// };
 
 export const selectUser = (state) => state.user.value;
 export const selectUserLoginState = (state) => state.user.isLoggedIn;

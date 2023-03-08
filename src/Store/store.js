@@ -11,7 +11,6 @@ import {
   REGISTER,
 } from "redux-persist";
 import userSlice from "./Slices/userSlice";
-// import thunk from "redux-thunk";
 
 const persistConfig = {
   key: "root",

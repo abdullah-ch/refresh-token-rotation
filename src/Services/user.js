@@ -1,3 +1,3 @@
-import axios from "./index";
+import axios from "./axiosConfig.js";
 
 export const getUser = () => axios.get("user");

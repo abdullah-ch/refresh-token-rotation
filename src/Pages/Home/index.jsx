@@ -16,8 +16,12 @@ export const Home = () => {
   }, []);
   return (
     <div>
-      Home
-      {userInfo ? <h1>I have user info</h1> : null}
+      {userInfo ? (
+        <div className="flex justify-center items-center flex-col">
+          <h1>Name: {userInfo.name}</h1>
+          <h1>Email: {userInfo.email}</h1>
+        </div>
+      ) : null}
     </div>
   );
 };

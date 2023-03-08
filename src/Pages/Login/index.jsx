@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { logIn } from "../../Store/Slices/userSlice";
+import { useNavigate } from "react-router-dom";
+import { logInUser } from "../../Services/auth";
+import { setLogIn } from "../../Store/Slices/userSlice";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [credentials, setCredentials] = useState({
     email: null,
@@ -27,7 +30,11 @@ const Login = () => {
   const login = async () => {
     try {
       // redirect to home
-      dispatch(logIn(credentials));
+      // dispatch(logIn(credentials));
+      const { data } = await logInUser(credentials);
+      localStorage.setItem("accessToken", data.accessToken);
+      dispatch(setLogIn(true));
+      navigate("/");
     } catch (error) {
       console.log("error ==> ", error);
       alert(error?.response?.data?.errors[0]);
