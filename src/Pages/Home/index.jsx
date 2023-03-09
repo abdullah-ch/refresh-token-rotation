@@ -58,6 +58,14 @@ export const Home = () => {
       >
         Dispatch Multiple APIs
       </button>
+
+      {songs.map((song) => {
+        return (
+          <ul key={crypto.randomUUID()}>
+            <li>{song.track}</li>
+          </ul>
+        );
+      })}
     </div>
   );
 };
