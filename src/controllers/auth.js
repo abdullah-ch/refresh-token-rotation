@@ -17,6 +17,43 @@ const {
   decodeUser,
 } = require("../utils");
 
+async function handleRefreshTokenError(error, req, res) {
+  const { refreshToken } = req.cookies;
+  let updatedUser = null;
+
+  res.clearCookie("refreshToken");
+
+  const decodedUser = decodeUser(
+    refreshToken,
+    process.env.JWT_SECRET_REFRESH_TOKEN
+  );
+  console.log("decodedUser ===> without verifying ===> ", decodedUser);
+
+  // remove expired refreshToken From Users RT List
+  if (decodedUser) {
+    updatedUser = await removeRefreshTokenUser(decodedUser.id, refreshToken);
+  }
+
+  console.log("ERRROR ===> error ===> refreshTokenSets ", error.message);
+
+  if (error?.message === "jwt expired") {
+    if (updatedUser) {
+      console.log("updatedUser ===> ", updatedUser);
+      return res.status(403).send({
+        message: "Refresh Token has expired !",
+      });
+    }
+  } else if (error?.message === "jwt malformed") {
+    return res.status(403).send({
+      message: "Refresh Token is malformed !",
+    });
+  }
+
+  return res.status(500).send({
+    error: error,
+  });
+}
+
 const signupUser = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
@@ -166,39 +203,7 @@ const refreshTokenSets = async (req, res, next) => {
       });
     }
   } catch (error) {
-    const { refreshToken } = req.cookies;
-    let updatedUser = null;
-    res.clearCookie("refreshToken");
-
-    const decodedUser = decodeUser(
-      refreshToken,
-      process.env.JWT_SECRET_REFRESH_TOKEN
-    );
-
-    console.log("decodedUser ===> without verifying ===> ", decodedUser);
-
-    // remove expired refreshToken From Users RT List
-    if (decodedUser) {
-      updatedUser = await removeRefreshTokenUser(decodedUser.id, refreshToken);
-    }
-
-    console.log("ERRROR ===> error ===> refreshTokenSets ", error.message);
-    if (error?.message === "jwt expired") {
-      if (updatedUser) {
-        console.log("updatedUser ===> ", updatedUser);
-        return res.status(403).send({
-          message: "Refresh Token has expired !",
-        });
-      }
-    } else if (error?.message === "jwt malformed") {
-      return res.status(403).send({
-        message: "Refresh Token is malformed !",
-      });
-    }
-
-    return res.status(500).send({
-      error: error,
-    });
+    handleRefreshTokenError(error, req, res);
   }
 };
 
@@ -243,40 +248,7 @@ const logOut = async (req, res, next) => {
     await removeRefreshTokenUser(decodedUser.id, refreshToken);
     return res.sendStatus(204);
   } catch (error) {
-    res.clearCookie("refreshToken");
-
-    const { refreshToken } = req.cookies;
-    let updatedUser = null;
-
-    const decodedUser = decodeUser(
-      refreshToken,
-      process.env.JWT_SECRET_REFRESH_TOKEN
-    );
-    console.log("decodedUser ===> without verifying ===> ", decodedUser);
-
-    // remove expired refreshToken From Users RT List
-    if (decodedUser) {
-      updatedUser = await removeRefreshTokenUser(decodedUser.id, refreshToken);
-    }
-
-    console.log("ERRROR ===> error ===> logOut ", error.message);
-
-    if (error?.message === "jwt expired") {
-      if (updatedUser) {
-        console.log("updatedUser ===> ", updatedUser);
-        return res.status(403).send({
-          message: "Refresh Token has expired !",
-        });
-      }
-    } else if (error?.message === "jwt malformed") {
-      return res.status(403).send({
-        message: "Refresh Token is malformed !",
-      });
-    }
-
-    return res.status(403).send({
-      error: error,
-    });
+    handleRefreshTokenError(error, req, res);
   }
 };
 module.exports = {
