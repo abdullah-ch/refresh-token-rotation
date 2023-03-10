@@ -1,7 +1,6 @@
-# This Branch deals with Retrying Failed APIs with Stale Access Token in Axios
+# Retrying Failed APIs with Stale Access Token in Axios
 
-Advantages
-The retry mechanism with stale access tokens provides several advantages over manual handling of expired tokens:
+This Branch offers :
 
 * Automatic handling: The interceptor logic automatically handles expired access tokens without the need for manual intervention from the user.
 
