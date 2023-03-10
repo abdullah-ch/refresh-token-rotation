@@ -2,11 +2,11 @@
 
 This Branch offers :
 
-* Automatic handling: The interceptor logic automatically handles expired access tokens without the need for manual intervention from the user.
+* **Automatic handling**: The interceptor logic automatically handles expired access tokens without the need for manual intervention from the user.
 
-* Improved user experience: The retry mechanism ensures that API requests do not fail due to expired access tokens, which can improve the user experience and reduce frustration.
+* **Improved user experience**: The retry mechanism ensures that API requests do not fail due to expired access tokens, which can improve the user experience and reduce frustration.
 
-* Simplified codebase: The retry mechanism can simplify the codebase by reducing the number of error-handling branches and making it easier to manage access tokens.
+* **Simplified codebase**: The retry mechanism can simplify the codebase by reducing the number of error-handling branches and making it easier to manage access tokens.
 
 # Getting Started with Create React App
 
