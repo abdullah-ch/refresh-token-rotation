@@ -50,6 +50,12 @@ export const Home = () => {
         Cookies tabs in order to observe the Refresh Token Rotation and
         Automatic Retry Mechanism of Failed APIs with Stale Access Tokens.
       </h1>
+
+      <h1 className="font-bold">
+        Access Token Expiry time is 10 seconds. Refresh Token Expiry time is 300
+        seconds.
+      </h1>
+
       {userInfo ? (
         <div className="flex justify-center items-center flex-col">
           <h1>Name: {userInfo.name}</h1>
