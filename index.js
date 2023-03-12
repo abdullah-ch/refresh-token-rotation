@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-const { connect } = require('./src/config/database');
+const { connectDB } = require('./src/config/database');
 const authRouter = require('./src/routers/auth');
 const cookieParser = require('cookie-parser');
 const userRouter = require('./src/routers/user');
@@ -24,8 +24,9 @@ app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/song', songRouter);
 
-app.listen(port, () => {
-  console.log(`app listening on port ${port}`);
-  // mongodb connection
-  connect();
+//Connect to the database before listening
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log('listening for requests');
+  });
 });
