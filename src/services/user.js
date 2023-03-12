@@ -1,4 +1,4 @@
-const { userModel } = require("../mongodb/model");
+const { userModel } = require('../mongodb/model');
 
 /**
  ** fetches a user by its email.
@@ -121,7 +121,7 @@ const removeRefreshTokensUser = async (id) => {
  * @param {string} id - The ID of the user to update.
  * @param {string} oldRefreshToken - The old refresh token to replace.
  * @param {string} newRefreshToken - The new refresh token to assign to the user.
- * @returns {object} - An object containing information about the update.
+ * @returns {object | null} - An object containing information about the update.
  */
 const replaceRefreshTokenUser = async (
   id,
@@ -135,7 +135,7 @@ const replaceRefreshTokenUser = async (
     },
     {
       $set: {
-        "refreshToken.$": newRefreshToken,
+        'refreshToken.$': newRefreshToken,
       },
     }
   );
@@ -147,7 +147,7 @@ const replaceRefreshTokenUser = async (
  * This function removes a specific refresh token from a user in the database.
  * @param {string} id - The ID of the user to update.
  * @param {string} refreshToken - The refresh token to remove from the user.
- * @returns {object} - An object containing information about the update.
+ * @returns {object|null} - An object containing information about the update.
  */
 const removeRefreshTokenUser = async (id, refreshToken) => {
   const updatedUser = await userModel.updateOne(
