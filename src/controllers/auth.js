@@ -78,7 +78,8 @@ const loginUser = async (req, res, next) => {
     res.cookie('refreshToken', refreshToken, {
       maxAge: process.env.JWT_COOKIE_EXPIRY_TIME * 1000,
       secure: true,
-      httpOnly: true, // The cookie only accessible by the web server
+      httpOnly: true, // The cookie only accessible by the web server,
+      sameSite: 'none',
     });
 
     return res.status(200).send({
@@ -148,7 +149,8 @@ const refreshTokenSets = async (req, res, next) => {
       res.cookie('refreshToken', tokenSet.refreshToken, {
         maxAge: process.env.JWT_COOKIE_EXPIRY_TIME * 1000,
         secure: true,
-        httpOnly: true, // The cookie only accessible by the web server
+        httpOnly: true, // The cookie only accessible by the web server,
+        sameSite: 'none',
       });
 
       return res.status(200).send({
