@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { logInUser } from "../../Services/auth";
-import { setLogIn } from "../../Store/Slices/userSlice";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logInUser } from '../../Services/auth';
+import { setLogIn } from '../../Store/Slices/userSlice';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -15,16 +15,16 @@ const Login = () => {
 
   const handleCredentials = (e) => {
     const { value, name } = e.target;
-    if (name === "email") {
+    if (name === 'email') {
       setCredentials((prevState) => {
         return { ...prevState, email: value };
       });
-    } else if (name === "password") {
+    } else if (name === 'password') {
       setCredentials((prevState) => {
         return { ...prevState, password: value };
       });
     }
-    console.log("credentials are ====> ", credentials);
+    console.log('credentials are ====> ', credentials);
   };
 
   const login = async () => {
@@ -32,21 +32,21 @@ const Login = () => {
       // redirect to home
       // dispatch(logIn(credentials));
       const { data } = await logInUser(credentials);
-      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem('accessToken', data.accessToken);
       dispatch(setLogIn(true));
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      console.log("error ==> ", error);
-      alert(error?.response?.data?.errors[0]);
+      console.log('error ==> ', error);
+      alert(error?.response?.data?.error);
     }
   };
 
   const handleLogin = () => {
     if (!credentials.email) {
-      return alert("Please enter an Email !");
+      return alert('Please enter an Email !');
     }
     if (!credentials.password) {
-      return alert("Please enter a Password!");
+      return alert('Please enter a Password!');
     }
 
     // make the login API call here
@@ -75,9 +75,9 @@ const Login = () => {
         Submit
       </button>
       <div>
-        Don't have an account ?{" "}
+        Don't have an account ?{' '}
         <a href="signup" className="text-blue-600">
-          {" "}
+          {' '}
           Sign Up Here !
         </a>
       </div>

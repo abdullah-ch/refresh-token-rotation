@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { signUpUser } from "../../Services/auth";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { signUpUser } from '../../Services/auth';
 
 export const Signup = () => {
   const navigate = useNavigate();
@@ -13,20 +13,20 @@ export const Signup = () => {
 
   const handleCredentials = (e) => {
     const { value, name } = e.target;
-    if (name === "email") {
+    if (name === 'email') {
       setCredentials((prevState) => {
         return { ...prevState, email: value };
       });
-    } else if (name === "password") {
+    } else if (name === 'password') {
       setCredentials((prevState) => {
         return { ...prevState, password: value };
       });
-    } else if (name === "name") {
+    } else if (name === 'name') {
       setCredentials((prevState) => {
         return { ...prevState, name: value };
       });
     }
-    console.log("credentials are ====> ", credentials);
+    console.log('credentials are ====> ', credentials);
   };
 
   const signUp = async () => {
@@ -34,22 +34,22 @@ export const Signup = () => {
       // redirect to home
       // dispatch(logIn(credentials));
       await signUpUser(credentials);
-      navigate("/login");
+      navigate('/login');
     } catch (error) {
-      console.log("error ==> ", error);
-      alert(error?.response?.data?.errors[0]);
+      console.log('error ==> ', error);
+      alert(error?.response?.data?.error);
     }
   };
 
   const handleSignUp = () => {
     if (!credentials.email) {
-      return alert("Please enter an Email !");
+      return alert('Please enter an Email !');
     }
     if (!credentials.password) {
-      return alert("Please enter a Password!");
+      return alert('Please enter a Password!');
     }
     if (!credentials.name) {
-      return alert("Please enter a Name!");
+      return alert('Please enter a Name!');
     }
 
     signUp();
@@ -83,7 +83,7 @@ export const Signup = () => {
         Submit
       </button>
       <div>
-        Already have an account ?{" "}
+        Already have an account ?{' '}
         <a href="login" className="text-blue-600">
           Login Here !
         </a>

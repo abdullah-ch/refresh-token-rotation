@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useRef, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   lanaDelReySongs,
   randomArtistsSongs,
   taylorSwiftSongs,
-} from "../../Services/song";
-import { getCurrentUser, selectUser } from "../../Store/Slices/userSlice";
+} from '../../Services/song';
+import { getCurrentUser, selectUser } from '../../Store/Slices/userSlice';
 
 export const Home = () => {
   const [songs, setSongs] = useState([]);
@@ -29,22 +29,27 @@ export const Home = () => {
     ]);
 
     for (const response of responses) {
-      if (response.status === "fulfilled") {
+      if (response.status === 'fulfilled') {
         const { songs } = response.value.data;
         setSongs((prevSongs) => {
           return [...prevSongs, ...songs];
         });
       } else {
         // handle error here
-        console.log("response ===> ", response.value.data);
+        console.log('response ===> ', response.value.data);
       }
     }
   };
 
-  console.log("SONGS ===> ", songs);
+  console.log('SONGS ===> ', songs);
 
   return (
     <div className="flex justify-center items-center flex-col w-full gap-3">
+      <h1 className="font-bold m-4">
+        Please access your Dev Tools and navigate to both the Network and
+        Cookies tabs in order to observe the Refresh Token Rotation and
+        Automatic Retry Mechanism of Failed APIs with Stale Access Tokens.
+      </h1>
       {userInfo ? (
         <div className="flex justify-center items-center flex-col">
           <h1>Name: {userInfo.name}</h1>
