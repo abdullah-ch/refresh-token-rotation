@@ -1,23 +1,27 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { logOut } from "../../Services/auth";
-import { persistor } from "../../Store/store.js";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { logOut } from '../../Services/auth';
+import { persistor } from '../../Store/store.js';
+import { useAlert } from 'react-alert';
 
 const Header = () => {
   const navigate = useNavigate();
+  const alert = useAlert();
 
   const handleHome = () => {
-    navigate("/");
+    navigate('/');
   };
   const handlelogOut = async () => {
     try {
       await logOut();
       localStorage.clear();
       await persistor.purge();
-      navigate("/login");
+      navigate('/login');
     } catch (error) {
-      console.log("error ===> ", error);
-      alert(error?.response?.data?.errors[0]);
+      console.log('error ===> ', error);
+      error?.response?.data?.errors.forEach((errObj) => {
+        alert.error(errObj.message);
+      });
     }
   };
   return (

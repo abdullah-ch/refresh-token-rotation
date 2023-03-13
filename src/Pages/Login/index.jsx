@@ -48,10 +48,10 @@ const Login = () => {
 
   const handleLogin = () => {
     if (!credentials.email) {
-      return alert('Please enter an Email !');
+      return alert.error('Please enter an Email !');
     }
     if (!credentials.password) {
-      return alert('Please enter a Password!');
+      return alert.error('Please enter a Password!');
     }
 
     // make the login API call here
