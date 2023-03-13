@@ -3,10 +3,12 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logInUser } from '../../Services/auth';
 import { setLogIn } from '../../Store/Slices/userSlice';
+import { useAlert } from 'react-alert';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const alert = useAlert();
 
   const [credentials, setCredentials] = useState({
     email: null,
@@ -36,8 +38,11 @@ const Login = () => {
       dispatch(setLogIn(true));
       navigate('/');
     } catch (error) {
-      console.log('error ==> ', error);
-      alert(error?.response?.data?.error);
+      console.log('error ==> ', error?.response?.data?.errors);
+
+      error?.response?.data?.errors.forEach((errObj) => {
+        alert.error(errObj.message);
+      });
     }
   };
 

@@ -36,7 +36,7 @@ export const Home = () => {
         });
       } else {
         // handle error here
-        console.log('response ===> ', response.value.data);
+        console.log('response ===> ', response.value);
       }
     }
   };

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signUpUser } from '../../Services/auth';
+import { useAlert } from 'react-alert';
 
 export const Signup = () => {
   const navigate = useNavigate();
+  const alert = useAlert();
 
   const [credentials, setCredentials] = useState({
     email: null,
@@ -37,7 +39,10 @@ export const Signup = () => {
       navigate('/login');
     } catch (error) {
       console.log('error ==> ', error);
-      alert(error?.response?.data?.error);
+
+      error?.response?.data?.errors.forEach((errObj) => {
+        alert.error(errObj.message);
+      });
     }
   };
 
