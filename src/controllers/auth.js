@@ -1,4 +1,9 @@
 const {
+  BAD_REQUEST,
+  INTERNAL_SERVER,
+  UN_AUTHORIZED,
+} = require('../constants/errorCodes');
+const {
   getUserByEmail,
   saveUser,
   assignRefreshTokenToUser,
@@ -12,14 +17,20 @@ const {
   generateTokenSet,
   extractUser,
 } = require('../utils');
-const { refreshTokenReuseDetection } = require('../utils/auth');
+const {
+  refreshTokenReuseDetection,
+  handleRefreshTokenError,
+} = require('../utils/auth');
+const AppError = require('../utils/error');
 
 const signupUser = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
     const isUser = await getUserByEmail(email);
     if (isUser) {
-      return res.status(400).send({ error: 'Email is already taken !' });
+      return next(
+        AppError({ message: 'Email is already taken !' }, BAD_REQUEST)
+      );
     }
 
     // create password hash
@@ -41,9 +52,9 @@ const signupUser = async (req, res, next) => {
         throw error;
       });
   } catch (error) {
-    return res.status(500).send({
-      error,
-    });
+    return next(
+      new AppError({ message: 'Something went wrong !' }, INTERNAL_SERVER)
+    );
   }
 };
 
@@ -54,14 +65,17 @@ const loginUser = async (req, res, next) => {
     const user = await getUserByEmail(trimmedEmail);
 
     if (!user)
-      return res.status(400).send({
-        error: 'User does not exist',
-      });
+      return next(
+        new AppError({ message: 'User does not exist' }, BAD_REQUEST)
+      );
 
     if (!(await checkPassword(password, user.password))) {
-      return res.status(400).send({
-        error: 'Email or Password is not correct',
-      });
+      return next(
+        new AppError(
+          { message: 'Email or Password is not correct' },
+          BAD_REQUEST
+        )
+      );
     }
 
     // creates JWT TOKEN SET
@@ -88,9 +102,9 @@ const loginUser = async (req, res, next) => {
     });
   } catch (error) {
     console.log('ERRROR ===> error ', error);
-    return res.status(500).send({
-      error: error,
-    });
+    return next(
+      new AppError({ message: 'Something went wrong !' }, INTERNAL_SERVER)
+    );
   }
 };
 
@@ -100,9 +114,14 @@ const refreshTokenSets = async (req, res, next) => {
 
     if (!refreshToken) {
       res.clearCookie('refreshToken');
-      return res.status(403).send({
-        message: 'No Refresh Token Found !',
-      });
+      return next(
+        new AppError(
+          {
+            message: 'No Refresh Token Found !',
+          },
+          UN_AUTHORIZED
+        )
+      );
     }
 
     const decodedUser = extractUser(
@@ -158,7 +177,8 @@ const refreshTokenSets = async (req, res, next) => {
       });
     }
   } catch (error) {
-    handleRefreshTokenError(error, req, res);
+    console.log('refreshTokenSets ===> ', error);
+    await handleRefreshTokenError(error, req, res);
   }
 };
 
@@ -169,9 +189,14 @@ const logOut = async (req, res, next) => {
     const { refreshToken } = req.cookies;
 
     if (!refreshToken) {
-      return res.status(403).send({
-        message: 'No Refresh Token Found !',
-      });
+      return next(
+        new AppError(
+          {
+            message: 'No Refresh Token Found !',
+          },
+          UN_AUTHORIZED
+        )
+      );
     }
 
     const decodedUser = extractUser(
@@ -196,7 +221,7 @@ const logOut = async (req, res, next) => {
     await removeRefreshTokenUser(decodedUser.id, refreshToken);
     return res.sendStatus(204);
   } catch (error) {
-    handleRefreshTokenError(error, req, res);
+    await handleRefreshTokenError(error, req, res);
   }
 };
 module.exports = {

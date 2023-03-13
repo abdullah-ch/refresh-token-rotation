@@ -1,4 +1,6 @@
-const { getSpecificDetailsUser } = require("../services/user");
+const { UN_AUTHORIZED } = require('../constants/errorCodes');
+const { getSpecificDetailsUser } = require('../services/user');
+const AppError = require('../utils/error');
 
 const getUserInformation = async (req, res, next) => {
   try {
@@ -11,9 +13,9 @@ const getUserInformation = async (req, res, next) => {
       user: userDetails,
     });
   } catch (error) {
-    return res.status(500).send({
-      error: error,
-    });
+    return next(
+      new AppError({ message: 'Something went wrong !' }, UN_AUTHORIZED)
+    );
   }
 };
 

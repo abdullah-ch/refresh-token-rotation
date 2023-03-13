@@ -1,26 +1,28 @@
-const { body, validationResult } = require("express-validator");
+const { body, validationResult } = require('express-validator');
+const { UN_PROCESSABLE } = require('../constants/errorCodes');
+const AppError = require('../utils/error');
 const userSignUpRules = () => {
   return [
-    body("email").isEmail().withMessage("Invalid Email Format"),
-    body("password")
+    body('email').isEmail().withMessage('Invalid Email Format'),
+    body('password')
       .not()
       .isEmpty()
       .bail()
       .isLength({ min: 6 })
-      .withMessage("password must be at least 6 chars long"),
-    body("name").isString().not().isEmpty().withMessage("Name cannot be empty"),
+      .withMessage('password must be at least 6 chars long'),
+    body('name').isString().not().isEmpty().withMessage('Name cannot be empty'),
   ];
 };
 
 const userLogInRules = () => {
   return [
-    body("email").isEmail().withMessage("Invalid Email Format"),
-    body("password")
+    body('email').isEmail().withMessage('Invalid Email Format'),
+    body('password')
       .not()
       .isEmpty()
       .bail()
       .isLength({ min: 6 })
-      .withMessage("password must be at least 6 chars long"),
+      .withMessage('password must be at least 6 chars long'),
   ];
 };
 
@@ -30,11 +32,9 @@ const validate = (req, res, next) => {
     return next();
   }
   const extractedErrors = [];
-  errors.array().map((err) => extractedErrors.push({ [err.param]: err.msg }));
+  errors.array().map((err) => extractedErrors.push({ message: err.msg }));
 
-  return res.status(422).json({
-    errors: extractedErrors,
-  });
+  next(new AppError(extractedErrors, UN_PROCESSABLE));
 };
 
 module.exports = {

@@ -1,8 +1,10 @@
+const { UN_AUTHORIZED, INTERNAL_SERVER } = require('../constants/errorCodes');
 const {
   findUserRefreshToken,
   removeRefreshTokenUser,
   removeRefreshTokensUser,
 } = require('../services/user');
+const AppError = require('./error');
 
 const { decodeUser } = require('./index.js');
 
@@ -26,9 +28,15 @@ const refreshTokenReuseDetection = async (decodedUser, refreshToken, res) => {
     );
     await removeRefreshTokensUser(decodedUser.id);
     res.clearCookie('refreshToken');
-    res.status(403).send({
-      message: 'Refresh Token is invalid !',
-    });
+    next(
+      new AppError(
+        {
+          message: 'Refresh Token is invalid !',
+        },
+        UN_AUTHORIZED
+      )
+    );
+
     return true;
   }
 
@@ -64,19 +72,29 @@ const handleRefreshTokenError = async (error, req, res) => {
   if (error?.message === 'jwt expired') {
     if (updatedUser) {
       console.log('updatedUser ===> ', updatedUser);
-      return res.status(403).send({
-        message: 'Refresh Token has expired !',
-      });
+      return next(
+        new AppError(
+          {
+            message: 'Refresh Token has expired !',
+          },
+          UN_AUTHORIZED
+        )
+      );
     }
   } else if (error?.message === 'jwt malformed') {
-    return res.status(403).send({
-      message: 'Refresh Token is malformed !',
-    });
+    return next(
+      new AppError(
+        {
+          message: 'Refresh Token is malformed !',
+        },
+        UN_AUTHORIZED
+      )
+    );
   }
 
-  return res.status(500).send({
-    error: error,
-  });
+  return next(
+    new AppError({ message: 'Something went wrong !' }, INTERNAL_SERVER)
+  );
 };
 
 module.exports = {

@@ -4,8 +4,8 @@ const {
   JWT_SECRET_ACCESS_TOKEN_TIME,
   JWT_SECRET_REFRESH_TOKEN_TIME,
 } = process.env;
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 /**
   
@@ -19,7 +19,7 @@ const generatePassword = async (password) => {
     const newPassword = await bcrypt.hash(password, salt);
     return newPassword;
   } catch (error) {
-    console.log("here in error ==> utils ==> ", error.message);
+    console.log('here in error ==> utils ==> ', error.message);
     return false;
   }
 };
@@ -29,7 +29,7 @@ const generatePassword = async (password) => {
   @param {string} str - String to be trimmed and converted to lowercase.
   @returns {string} - Returns the trimmed and lowercase string.
   */
-const trimLowerCaseString = (str) => str.toLowerCase().replace(/\s+/g, "");
+const trimLowerCaseString = (str) => str.toLowerCase().replace(/\s+/g, '');
 /**
   
   Checks if the provided password matches the provided hash using bcrypt.
@@ -72,7 +72,7 @@ const extractUser = (token, secret) => {
   try {
     return jwt.verify(token, secret);
   } catch (error) {
-    console.log("error ===> extractUser ", error);
+    console.log('error ===> extractUser ', error);
     throw error;
   }
 };
@@ -86,6 +86,29 @@ const extractUser = (token, secret) => {
 const decodeUser = (token, secret) => {
   return jwt.decode(token, secret);
 };
+
+/**
+ * Formats an error object or array to a standardized format.
+ * If the input is an array, it is returned as-is. If the input is an object,
+ * its values are extracted and returned as an array of objects with a
+ * 'message' property.
+ *
+ * @param {*} error - The error object or array to format.
+ * @returns {Array} An array of error objects with a 'message' property.
+ */
+const formatError = (error) => {
+  if (Array.isArray(error)) {
+    return error;
+  } else if (typeof error === 'object') {
+    const extractedErrors = [];
+    Object.values(error).forEach((errorObj) => {
+      extractedErrors.push({ message: errorObj });
+    });
+    return extractedErrors;
+  }
+
+  return error;
+};
 module.exports = {
   generatePassword,
   trimLowerCaseString,
@@ -93,4 +116,5 @@ module.exports = {
   generateTokenSet,
   extractUser,
   decodeUser,
+  formatError,
 };
