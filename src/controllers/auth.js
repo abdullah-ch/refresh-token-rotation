@@ -2,26 +2,26 @@ const {
   BAD_REQUEST,
   INTERNAL_SERVER,
   UN_AUTHORIZED,
-} = require('../constants/errorCodes');
+} = require("../constants/errorCodes");
 const {
   getUserByEmail,
   saveUser,
   assignRefreshTokenToUser,
   replaceRefreshTokenUser,
   removeRefreshTokenUser,
-} = require('../services/user');
+} = require("../services/user");
 const {
   generatePassword,
   trimLowerCaseString,
   checkPassword,
   generateTokenSet,
   extractUser,
-} = require('../utils');
+} = require("../utils");
 const {
   refreshTokenReuseDetection,
   handleRefreshTokenError,
-} = require('../utils/auth');
-const AppError = require('../utils/error');
+} = require("../utils/auth");
+const AppError = require("../utils/error");
 
 const signupUser = async (req, res, next) => {
   try {
@@ -29,7 +29,7 @@ const signupUser = async (req, res, next) => {
     const isUser = await getUserByEmail(email);
     if (isUser) {
       return next(
-        AppError({ message: 'Email is already taken !' }, BAD_REQUEST)
+        new AppError({ message: "Email is already taken !" }, BAD_REQUEST)
       );
     }
 
@@ -44,7 +44,7 @@ const signupUser = async (req, res, next) => {
     saveUser(user)
       .then((savedUser) => {
         return res.status(200).send({
-          message: 'Account Created Successfully !',
+          message: "Account Created Successfully !",
           data: savedUser,
         });
       })
@@ -53,7 +53,7 @@ const signupUser = async (req, res, next) => {
       });
   } catch (error) {
     return next(
-      new AppError({ message: 'Something went wrong !' }, INTERNAL_SERVER)
+      new AppError({ message: "Something went wrong !" }, INTERNAL_SERVER)
     );
   }
 };
@@ -66,13 +66,13 @@ const loginUser = async (req, res, next) => {
 
     if (!user)
       return next(
-        new AppError({ message: 'User does not exist' }, BAD_REQUEST)
+        new AppError({ message: "User does not exist" }, BAD_REQUEST)
       );
 
     if (!(await checkPassword(password, user.password))) {
       return next(
         new AppError(
-          { message: 'Email or Password is not correct' },
+          { message: "Email or Password is not correct" },
           BAD_REQUEST
         )
       );
@@ -89,21 +89,21 @@ const loginUser = async (req, res, next) => {
 
     await assignRefreshTokenToUser(user._id, refreshToken);
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       maxAge: process.env.JWT_COOKIE_EXPIRY_TIME * 1000,
       secure: true,
       httpOnly: true, // The cookie only accessible by the web server,
-      sameSite: 'none',
+      sameSite: "none",
     });
 
     return res.status(200).send({
       accessToken: accessToken,
-      message: 'Logged In Successfully !',
+      message: "Logged In Successfully !",
     });
   } catch (error) {
-    console.log('ERRROR ===> error ', error);
+    console.log("ERRROR ===> error ", error);
     return next(
-      new AppError({ message: 'Something went wrong !' }, INTERNAL_SERVER)
+      new AppError({ message: "Something went wrong !" }, INTERNAL_SERVER)
     );
   }
 };
@@ -113,11 +113,11 @@ const refreshTokenSets = async (req, res, next) => {
     const { refreshToken } = req.cookies;
 
     if (!refreshToken) {
-      res.clearCookie('refreshToken');
+      res.clearCookie("refreshToken");
       return next(
         new AppError(
           {
-            message: 'No Refresh Token Found !',
+            message: "No Refresh Token Found !",
           },
           UN_AUTHORIZED
         )
@@ -130,7 +130,7 @@ const refreshTokenSets = async (req, res, next) => {
     );
 
     req.user = decodedUser;
-    console.log('DECODED USER ====> refreshTokenSets ', req.user);
+    console.log("DECODED USER ====> refreshTokenSets ", req.user);
 
     const isHacker = await refreshTokenReuseDetection(
       decodedUser,
@@ -139,7 +139,7 @@ const refreshTokenSets = async (req, res, next) => {
     );
 
     if (isHacker) {
-      console.log('This user has been hacked, returning ===> ');
+      console.log("This user has been hacked, returning ===> ");
       return;
     }
 
@@ -161,15 +161,15 @@ const refreshTokenSets = async (req, res, next) => {
 
     if (updatedRefreshToken) {
       console.log(
-        'updatedRefreshToken ====> replaceRefreshTokenUser ===>  ',
+        "updatedRefreshToken ====> replaceRefreshTokenUser ===>  ",
         updatedRefreshToken
       );
 
-      res.cookie('refreshToken', tokenSet.refreshToken, {
+      res.cookie("refreshToken", tokenSet.refreshToken, {
         maxAge: process.env.JWT_COOKIE_EXPIRY_TIME * 1000,
         secure: true,
         httpOnly: true, // The cookie only accessible by the web server,
-        sameSite: 'none',
+        sameSite: "none",
       });
 
       return res.status(200).send({
@@ -177,14 +177,14 @@ const refreshTokenSets = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log('refreshTokenSets ===> ', error);
+    console.log("refreshTokenSets ===> ", error);
     await handleRefreshTokenError(error, req, res);
   }
 };
 
 const logOut = async (req, res, next) => {
   try {
-    res.clearCookie('refreshToken');
+    res.clearCookie("refreshToken");
 
     const { refreshToken } = req.cookies;
 
@@ -192,7 +192,7 @@ const logOut = async (req, res, next) => {
       return next(
         new AppError(
           {
-            message: 'No Refresh Token Found !',
+            message: "No Refresh Token Found !",
           },
           UN_AUTHORIZED
         )
@@ -204,7 +204,7 @@ const logOut = async (req, res, next) => {
       process.env.JWT_SECRET_REFRESH_TOKEN
     );
 
-    console.log('DECODED USER ====> logOut ', decodedUser);
+    console.log("DECODED USER ====> logOut ", decodedUser);
 
     const isHacker = await refreshTokenReuseDetection(
       decodedUser,
@@ -213,7 +213,7 @@ const logOut = async (req, res, next) => {
     );
 
     if (isHacker) {
-      console.log('This user has been hacked, returning ===> ');
+      console.log("This user has been hacked, returning ===> ");
       return;
     }
 
