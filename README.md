@@ -16,5 +16,3 @@ The implementation of the refresh token rotation involves generating a new refre
 # Contributing
 Contributions are welcome. Please feel free to submit a pull request or open an issue for any bugs or feature requests.
 
-# License
-This code is licensed under the MIT License.
