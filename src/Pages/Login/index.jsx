@@ -4,8 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { logInUser } from '../../Services/auth';
 import { setLogIn } from '../../Store/Slices/userSlice';
 import { useAlert } from 'react-alert';
+import { useReducer } from 'react';
+import { ACTIONS, loginReducer } from '../../Reducers/loginReducer';
+import SpinnerButton from '../../Components/Button';
 
+const initialState = {
+  userDetails: '',
+  loading: false,
+  error: null,
+};
 const Login = () => {
+  const [state, dispatcher] = useReducer(loginReducer, initialState);
+  const { userDetails, loading } = state;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const alert = useAlert();
@@ -26,21 +37,27 @@ const Login = () => {
         return { ...prevState, password: value };
       });
     }
-    console.log('credentials are ====> ', credentials);
   };
 
   const login = async () => {
     try {
-      // redirect to home
-      // dispatch(logIn(credentials));
+      dispatcher({
+        type: ACTIONS.CALL_API,
+      });
       const { data } = await logInUser(credentials);
-      localStorage.setItem('accessToken', data.accessToken);
+      dispatcher({
+        type: ACTIONS.SUCCESS,
+        data: data,
+      });
+      localStorage.setItem('accessToken', userDetails.accessToken);
       dispatch(setLogIn(true));
       navigate('/');
-    } catch (error) {
-      console.log('error ==> ', error?.response?.data?.errors);
-
-      error?.response?.data?.errors.forEach((errObj) => {
+    } catch (err) {
+      dispatcher({
+        type: ACTIONS.ERROR,
+        data: err,
+      });
+      err?.response?.data?.errors?.forEach((errObj) => {
         alert.error(errObj.message);
       });
     }
@@ -73,12 +90,12 @@ const Login = () => {
         type="password"
         name="password"
       />
-      <button
-        onClick={handleLogin}
-        className="border rounded-md border-solid border-black p-1"
-      >
-        Submit
-      </button>
+      <SpinnerButton
+        handleClick={handleLogin}
+        label={'Submit'}
+        isLoading={loading}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      />
       <div>
         Don't have an account ?{' '}
         <a href="signup" className="text-blue-600">

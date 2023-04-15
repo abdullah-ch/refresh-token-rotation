@@ -6,12 +6,14 @@ import {
   taylorSwiftSongs,
 } from '../../Services/song';
 import { getCurrentUser, selectUser } from '../../Store/Slices/userSlice';
+import SpinnerButton from '../../Components/Button';
 
 export const Home = () => {
   const [songs, setSongs] = useState([]);
   const dispatch = useDispatch();
   const apiRef = useRef(true);
   const userInfo = useSelector(selectUser);
+  const [loading, setLoading] = useState();
 
   useEffect(() => {
     if (apiRef.current) {
@@ -22,11 +24,14 @@ export const Home = () => {
   }, []);
 
   const callSongsAPIs = async () => {
+    setLoading(true);
     const responses = await Promise.allSettled([
       lanaDelReySongs(),
       taylorSwiftSongs(),
       randomArtistsSongs(),
     ]);
+
+    setLoading(false);
 
     for (const response of responses) {
       if (response.status === 'fulfilled') {
@@ -35,13 +40,12 @@ export const Home = () => {
           return [...prevSongs, ...songs];
         });
       } else {
+        setLoading(false);
+
         // handle error here
-        console.log('response ===> ', response.value);
       }
     }
   };
-
-  console.log('SONGS ===> ', songs);
 
   return (
     <div className="flex justify-center items-center flex-col w-full gap-3">
@@ -63,12 +67,12 @@ export const Home = () => {
         </div>
       ) : null}
 
-      <button
-        onClick={callSongsAPIs}
-        className="border rounded-md border-solid border-black p-1"
-      >
-        Dispatch Multiple APIs
-      </button>
+      <SpinnerButton
+        handleClick={callSongsAPIs}
+        label={'Dispatch Multiple APIs'}
+        isLoading={loading}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      />
 
       {songs.map((song) => {
         return (

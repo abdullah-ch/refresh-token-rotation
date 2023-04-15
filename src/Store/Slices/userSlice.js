@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { PURGE } from "redux-persist";
-import { logInUser } from "../../Services/auth";
-import { getUser } from "../../Services/user";
+import { createSlice } from '@reduxjs/toolkit';
+import { PURGE } from 'redux-persist';
+import { logInUser } from '../../Services/auth';
+import { getUser } from '../../Services/user';
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState: {
     value: null,
     isLoggedIn: false,
@@ -32,18 +32,12 @@ export const { setUser, setLogIn, resetState } = userSlice.actions;
 export const logIn = (userInfo) => {
   return async (dispatch) => {
     try {
-      console.log("SENDING CREDENTIALS ===> ", userInfo);
       const response = await logInUser(userInfo);
-      console.log("RESPONSE ===> ", response.data.accessToken);
       // set the access token in localStorage
-      localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem('accessToken', response.data.accessToken);
       dispatch(setLogIn(true));
-      window.location.href = "/";
+      window.location.href = '/';
     } catch (error) {
-      console.log(
-        "error ==> getCurrentUser ==>",
-        error?.response?.data?.errors[0]
-      );
       alert(error?.response?.data?.errors[0]);
     }
   };
@@ -53,10 +47,8 @@ export const getCurrentUser = () => {
   return async (dispatch) => {
     try {
       const response = await getUser();
-      console.log("user data ====> ", response.data.user);
       dispatch(setUser(response.data.user));
     } catch (error) {
-      console.log("error ==> getCurrentUser ==>", error);
       //   alert(error?.response?.data?.errors[0]);
     }
   };
