@@ -1,5 +1,5 @@
 # Refresh Token Rotation
-This Repository implements Refresh Token Rotation Authentication System using MERN (Mongo DB - Express - React - Node) Stack
+This Repository implements Refresh Token Rotation Authentication System and Automatic Retry Mechanism of Failed APIs with Stale Access Tokens using MERN (Mongo DB - Express - React - Node) Stack
 
 It consists of two branches, Backend and Frontend :-
 
